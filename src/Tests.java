@@ -105,8 +105,8 @@ public class Tests {
         int[] testingLabels = new int[100];
         try {
             // You may need to change the path:
-            loadData(".\\src\\files\\training-set.csv", trainingData, trainingLabels);
-            loadData(".\\src\\files\\testing-set.csv", testingData, testingLabels);
+            loadData("src\\files\\training-set.csv", trainingData, trainingLabels);
+            loadData("src\\files\\testing-set.csv", testingData, testingLabels);
         }
         catch (IOException e) {
             System.out.println("Error reading data files: " + e.getMessage());
@@ -118,8 +118,8 @@ public class Tests {
 
         // Add some lines here: ...
         for (int i = 0; i < testingData.length; i++) {
-            int best = knnClassify(trainingData, trainingLabels, testingData[i]);
-            if (testingLabels[i] == trainingLabels[best])
+            int label = knnClassify(trainingData, trainingLabels, testingData[i]);
+            if (testingLabels[i] == label)
                 correctPredictions++;
         }
 
