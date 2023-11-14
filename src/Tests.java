@@ -118,8 +118,8 @@ public class Tests {
 
         // Add some lines here: ...
         for (int i = 0; i < testingData.length; i++) {
-            int best = knnClassify(trainingData, trainingLabels, testingData[i]);
-            if (testingLabels[i] == trainingLabels[best])
+            int label = knnClassify(trainingData, trainingLabels, testingData[i]);
+            if (testingLabels[i] == label)
                 correctPredictions++;
         }
 
