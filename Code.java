@@ -1,7 +1,7 @@
 //in progress creating template for the project (movie dataset reading, masking, KNN for K=1)
 import java.io.*;
 import java.util.SplittableRandom; 
-
+ 
 public class Tests {
 
 	// Use we use 'static' for all methods to keep things simple, so we can call those methods main
