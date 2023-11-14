@@ -66,7 +66,9 @@ public class Tests {
                 bestMatch = i;
                 bestSimilarity = currentSimilarity;
             }
+            System.out.printf("i: %d currentSim: %.2f, bestSim: %.2f\n", i + 1, currentSimilarity, bestSimilarity);
         }
+        System.out.printf("bestSim: %.2f, bestMatch: %d\n", bestSimilarity, bestMatch);
         return trainingLabels[bestMatch];
     }
 
@@ -115,6 +117,11 @@ public class Tests {
         int correctPredictions = 0;
 
         // Add some lines here: ...
+        for (int i = 0; i < testingData.length; i++) {
+            int best = knnClassify(trainingData, trainingLabels, testingData[i]);
+            if (testingLabels[i] == trainingLabels[best])
+                correctPredictions++;
+        }
 
         double accuracy = (double) correctPredictions / testingData.length * 100;
         System.out.printf("A: %.2f%%\n", accuracy);
