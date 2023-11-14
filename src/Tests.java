@@ -68,7 +68,7 @@ public class Tests {
             }
             System.out.printf("i: %d currentSim: %.2f, bestSim: %.2f\n", i + 1, currentSimilarity, bestSimilarity);
         }
-        System.out.printf("bestSim: %.2f, bestMatch: %d\n", bestSimilarity, bestMatch);
+        System.out.printf("bestSim: %.2f, bestMatch: %d\n", bestSimilarity, bestMatch + 1);
         return trainingLabels[bestMatch];
     }
 
