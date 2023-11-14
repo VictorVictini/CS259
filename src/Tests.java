@@ -105,8 +105,8 @@ public class Tests {
         int[] testingLabels = new int[100];
         try {
             // You may need to change the path:
-            loadData(".\\src\\files\\training-set.csv", trainingData, trainingLabels);
-            loadData(".\\src\\files\\testing-set.csv", testingData, testingLabels);
+            loadData("src\\files\\training-set.csv", trainingData, trainingLabels);
+            loadData("src\\files\\testing-set.csv", testingData, testingLabels);
         }
         catch (IOException e) {
             System.out.println("Error reading data files: " + e.getMessage());
