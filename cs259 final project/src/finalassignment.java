@@ -20,29 +20,50 @@ public class finalassignment {
 	
     
 
- static int NumberOfFeatures = 1; 
+ static int NumberOfFeatures = 12; 
  static double[] toFeatureVector(double id, String genre, double runtime, double year, double imdb, double rt, double budget, double boxOffice) {	
  	
      double[] feature = new double[NumberOfFeatures]; 
      //feature[0] = id;  // We use the movie id as a numeric attribute.
     
-     switch (genre) { // We also use represent each movie genre as an integer number:
+    switch (genre) { // We also use represent each movie genre as an integer number:
      
          case "Action":  feature[0] = 0; break; 
-         case "Drama":   feature[0] = 1; break;
-         case "Romance": feature[0] = 2; break;
-         case "Sci-Fi": feature[0] = 3; break;
-         case "Adventure": feature[0] = 4; break;
-         case "Horror": feature[0] = 5; break;
-         case "Mystery": feature[0] = 6; break;
-         case "Thriller": feature[0] = 7; break;  
-                  
-     } 
+         case "Drama":   feature[1] = 0; break;
+         case "Romance": feature[2] = 0; break;
+         case "Sci-Fi": feature[3] = 0; break;
+         case "Adventure": feature[4] = 1; break;
+         case "Horror": feature[5] = 0; break;
+         case "Mystery": feature[6] = 1; break;
+         case "Thriller": feature[7] = 0; break;  
+         default: Assert(false);
+     }
+    //switch()
+    
+ 
+    
+     if (runtime >= 109) {//109
+    	 feature[8] = 1;
+     }else {
+    	 feature[8] = 0;
+     }
+     if(budget >= 98.04) { //98.04
+    	 feature[9] = 1;
+     }else {
+    	 feature[9] = 0;
+     }
+     
+     if(boxOffice >= 450 || boxOffice <= 100) {
+    	 feature[11] = 1;
+    }else {
+    	feature[11] = 0;
+     }
+     
      // That is all. We don't use any other attributes for prediction.
      return feature;
  }
  static  int like_count = 0, dislike_count = 0;
- static double [] FeatureCountsPos = new double [NumberOfFeatures];  // to count #{x AND pos}, where x can be cough, fever or sneezing. pos = having a flu 
+ static double [] FeatureCountsPos = new double [NumberOfFeatures];  
  static double [] FeatureCountsNeg = new double [NumberOfFeatures];
  static class NaiveBayesModel {     
 		
@@ -51,7 +72,7 @@ public class finalassignment {
 	   double estimate(double [] X){  // Returns the probability of the datapoint with the features X to belong to the positive class C, here C = having a flu 
 		   							// Implements the Naive Bayes prediction model as the slides 23-26 explain.
 			      	
-		// Initialize the score to the log of prior odds: log O(C) = log ( #{flu}/#{~flu} ) :
+		
 		double s = Math.log((double)like_count/dislike_count); 
 		Assert(dislike_count > 0);
 		Assert(like_count > 0);
@@ -108,14 +129,14 @@ public void ReportAccuracy(double data[][], int labels[]) {
   	  
   	  System.out.println(estimate(data[j]));
   	   int prediction;
-	       if (estimate(data[j])   >= .5765) // We apply .5765 probability threshold to predict the class, when estimate is above this number, we predict yes, else we predict no
+	       if (estimate(data[j])   >= .643) // We apply .643 probability threshold to predict the class, when estimate is above this number, we predict yes, else we predict no
 	    	   prediction = 1;     
 	       else
 	    	   prediction = 0;
   	  
         if (prediction == labels[j])
         	   number_correct_predictions++; 
-        		System.out.println(number_correct_predictions + " " + labels[j]);
+        		System.out.println("number of correct predictions: " + number_correct_predictions + " label: " + labels[j]);
         		
     }
     System.out.print((double)(number_correct_predictions/data.length * 100)); 
