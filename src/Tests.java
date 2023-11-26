@@ -1,6 +1,6 @@
 //in progress creating template for the project (movie dataset reading, masking, KNN for K=1)
 import java.io.*;
-import java.util.SplittableRandom;
+import java.util.*;
 
 public class Tests {
 
@@ -17,8 +17,8 @@ public class Tests {
     // Copy your vector operations here:
     // ...
     static double dot(double[] U, double[] V) {
-        double res = 0;
         Assert(U.length == V.length);
+        double res = 0;
         for (int i = 0; i < U.length; i++) {
             res += U[i] * V[i];
         }
@@ -26,25 +26,30 @@ public class Tests {
     }
 
 
-    static int NumberOfFeatures = 2;
+    static int NumberOfFeatures = 9;
     static double[] toFeatureVector(double id, String genre, double runtime, double year, double imdb, double rt, double budget, double boxOffice) {
 
-
         double[] feature = new double[NumberOfFeatures];
-        feature[0] = id;  // We use the movie id as a numeric attribute.
+        //feature[0] = id;  // don't need this, all unique and creates data bias
 
-        switch (genre) { // We also use represent each movie genre as an integer number:
-
-            case "Action":  feature[1] = 0; break;
-            case "Drama":   feature[1] = 1; break;
-            case "Romance": feature[1] = 2; break;
-            case "Sci-Fi": feature[1] = 3; break;
-            case "Adventure": feature[1] = 4; break;
-            case "Horror": feature[1] = 5; break;
-            case "Mystery": feature[1] = 6; break;
-            case "Thriller": feature[1] = 7; break;
-
+        // one-hot encoding for genre
+        switch (genre) {
+            case "Action":    feature[0] = 7; break;
+            case "Drama":     feature[0] = 1; break;
+            case "Romance":   feature[0] = 3; break;
+            case "Sci-Fi":    feature[0] = 6; break;
+            case "Adventure": feature[0] = 4; break;
+            case "Horror":    feature[0] = 2; break;
+            case "Mystery":   feature[0] = 0; break;
+            case "Thriller":  feature[0] = 5; break;
+            default:          Assert(false);
         }
+        feature[0] -= 3.8;
+        feature[0] /= 3;
+        feature[1] = year - 2024;
+        feature[1] /= 3; // update features later
+
+        //feature[8] = Math.log10(runtime); // subtract avg value
         // That is all. We don't use any other attributes for prediction.
         return feature;
     }
@@ -55,23 +60,25 @@ public class Tests {
     }
 
     // We have implemented KNN classifier for the K=1 case only. You are welcome to modify it to support any K
-    static int knnClassify(double[][] trainingData, int[] trainingLabels, double[] testFeature) {
-
-        int bestMatch = -1;
-        double bestSimilarity = - Double.MAX_VALUE;  // We start with the worst similarity that we can get in Java.
-
+    static int knnClassify(double[][] trainingData, int[] trainingLabels, double[] testFeature, int k) {
+        Assert(1 <= k && k <= trainingLabels.length);
+        ArrayList<Double> sim = new ArrayList<Double>();
+        ArrayList<Double> copy = new ArrayList<Double>(); // used for an unchanged copy of sim, for sorting index
+        ArrayList<Integer> index = new ArrayList<Integer>();
         for (int i = 0; i < trainingData.length; i++) {
-            double currentSimilarity = similarity(testFeature, trainingData[i]);
-            if (currentSimilarity > bestSimilarity) {
-                bestMatch = i;
-                bestSimilarity = currentSimilarity;
-            }
-            System.out.printf("i: %d currentSim: %.2f, bestSim: %.2f\n", i + 1, currentSimilarity, bestSimilarity);
+            double s = similarity(testFeature, trainingData[i]);
+            sim.add(s);
+            copy.add(s);
+            index.add(i);
         }
-        System.out.printf("bestSim: %.2f, bestMatch: %d\n", bestSimilarity, bestMatch + 1);
-        return trainingLabels[bestMatch];
+        Collections.sort(sim, (s1, s2) -> (int)Math.signum(s2 - s1)); // descending order
+        Collections.sort(index, (i1, i2) -> (int)Math.signum(copy.get(i2) - copy.get(i1))); // sorted identical to sim, because parallel arrays
+        int likeCount = 0;
+        for (int i = 0; i < k; i++) {
+            if (trainingLabels[index.get(i)] == 1) likeCount++;
+        }
+        return likeCount > k / 2 ? 1 : 0;
     }
-
 
     static void loadData(String filePath, double[][] dataFeatures, int[] dataLabels) throws IOException {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
@@ -113,18 +120,20 @@ public class Tests {
             return;
         }
 
+        int k = (int)Math.sqrt(trainingData.length);
+        if (k % 2 == 0) k++;
+
         // Compute accuracy on the testing set
         int correctPredictions = 0;
 
-        // Add some lines here: ...
         for (int i = 0; i < testingData.length; i++) {
-            int label = knnClassify(trainingData, trainingLabels, testingData[i]);
+            int label = knnClassify(trainingData, trainingLabels, testingData[i], k);
             if (testingLabels[i] == label)
                 correctPredictions++;
         }
 
         double accuracy = (double) correctPredictions / testingData.length * 100;
-        System.out.printf("A: %.2f%%\n", accuracy);
+        System.out.printf("A: %.2f%%, k: %d\n", accuracy, k);
 
     }
 }
